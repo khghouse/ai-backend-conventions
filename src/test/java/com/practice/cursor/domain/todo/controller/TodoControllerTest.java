@@ -1,0 +1,148 @@
+package com.practice.cursor.domain.todo.controller;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.practice.cursor.common.exception.CustomException;
+import com.practice.cursor.common.exception.ErrorCode;
+import com.practice.cursor.common.exception.GlobalExceptionHandler;
+import com.practice.cursor.domain.todo.dto.request.TodoCreateRequest;
+import com.practice.cursor.domain.todo.dto.request.TodoCreateServiceRequest;
+import com.practice.cursor.domain.todo.dto.response.TodoResponse;
+import com.practice.cursor.domain.todo.dto.request.TodoUpdateRequest;
+import com.practice.cursor.domain.todo.dto.request.TodoUpdateServiceRequest;
+import com.practice.cursor.support.ControllerTestSupport;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@Import(GlobalExceptionHandler.class)
+class TodoControllerTest extends ControllerTestSupport {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private static TodoResponse sample(Long id) {
+        LocalDateTime now = LocalDateTime.of(2026, 4, 2, 12, 0, 0);
+        return new TodoResponse(id, "할 일", "상세", false, false, now, now);
+    }
+
+    @Test
+    @DisplayName("POST 등록 요청이 성공하면 201과 ApiResponse로 본문을 반환한다")
+    void register_returnsCreatedWithApiResponse() throws Exception {
+        when(todoService.register(any(TodoCreateServiceRequest.class))).thenReturn(sample(1L));
+
+        mockMvc.perform(post("/api/todos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new TodoCreateRequest("할 일", "상세"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1))
+                .andExpect(jsonPath("$.data.title").value("할 일"))
+                .andExpect(jsonPath("$.data.content").value("상세"));
+
+        verify(todoService).register(any(TodoCreateServiceRequest.class));
+    }
+
+    @Test
+    @DisplayName("제목이 규칙에 맞지 않으면 400이며 서비스는 호출되지 않는다")
+    void register_invalidTitle_returnsBadRequestWithoutCallingService() throws Exception {
+        mockMvc.perform(post("/api/todos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new TodoCreateRequest("a", null))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error.message").isString());
+
+        verify(todoService, never()).register(any());
+    }
+
+    @Test
+    @DisplayName("PUT 수정 성공 시 200과 ApiResponse")
+    void update_returnsOk() throws Exception {
+        when(todoService.update(eq(1L), any(TodoUpdateServiceRequest.class))).thenReturn(sample(1L));
+
+        mockMvc.perform(put("/api/todos/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new TodoUpdateRequest("할 일", "상세"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1));
+
+        verify(todoService).update(eq(1L), any(TodoUpdateServiceRequest.class));
+    }
+
+    @Test
+    @DisplayName("GET 단건 조회 성공")
+    void getById_returnsOk() throws Exception {
+        when(todoService.getById(1L)).thenReturn(sample(1L));
+
+        mockMvc.perform(get("/api/todos/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.title").value("할 일"));
+    }
+
+    @Test
+    @DisplayName("GET 단건 없으면 404")
+    void getById_notFound_returns404() throws Exception {
+        when(todoService.getById(99L)).thenThrow(new CustomException(ErrorCode.TODO_NOT_FOUND));
+
+        mockMvc.perform(get("/api/todos/99"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false));
+    }
+
+    @Test
+    @DisplayName("GET 전체 조회")
+    void findAll_returnsList() throws Exception {
+        LocalDateTime now = LocalDateTime.of(2026, 4, 2, 12, 0, 0);
+        when(todoService.findAll())
+                .thenReturn(
+                        List.of(
+                                new TodoResponse(1L, "a", null, false, false, now, now),
+                                new TodoResponse(2L, "b", "x", false, true, now, now)));
+
+        mockMvc.perform(get("/api/todos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data[0].title").value("a"))
+                .andExpect(jsonPath("$.data[1].title").value("b"));
+    }
+
+    @Test
+    @DisplayName("PATCH 완료 처리")
+    void complete_returnsOk() throws Exception {
+        LocalDateTime now = LocalDateTime.of(2026, 4, 2, 12, 0, 0);
+        when(todoService.complete(1L)).thenReturn(new TodoResponse(1L, "할 일", null, false, true, now, now));
+
+        mockMvc.perform(patch("/api/todos/1/complete"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.completed").value(true));
+    }
+
+    @Test
+    @DisplayName("DELETE 소프트 삭제")
+    void delete_returnsOk() throws Exception {
+        LocalDateTime now = LocalDateTime.of(2026, 4, 2, 12, 0, 0);
+        when(todoService.delete(1L)).thenReturn(new TodoResponse(1L, "할 일", null, true, false, now, now));
+
+        mockMvc.perform(delete("/api/todos/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.deleted").value(true));
+    }
+}
