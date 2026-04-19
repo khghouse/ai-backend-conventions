@@ -1,12 +1,14 @@
 package com.practice.cursor.common.security;
 
+import com.practice.cursor.common.exception.CustomException;
+import com.practice.cursor.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -26,17 +28,21 @@ public class SecurityAuthenticationProvider implements AuthenticationProvider {
         String loginId = authentication.getName();
         String password = (String) authentication.getCredentials();
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(loginId);
-        
-        if (!passwordEncoder.matches(password, userDetails.getPassword())) {
-            throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
-        }
+        try {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(loginId);
+            
+            if (!passwordEncoder.matches(password, userDetails.getPassword())) {
+                throw new CustomException(ErrorCode.INVALID_CREDENTIALS);
+            }
 
-        return new UsernamePasswordAuthenticationToken(
-                userDetails, 
-                null, 
-                userDetails.getAuthorities()
-        );
+            return new UsernamePasswordAuthenticationToken(
+                    userDetails, 
+                    null, 
+                    userDetails.getAuthorities()
+            );
+        } catch (UsernameNotFoundException e) {
+            throw new CustomException(ErrorCode.INVALID_CREDENTIALS);
+        }
     }
 
     @Override

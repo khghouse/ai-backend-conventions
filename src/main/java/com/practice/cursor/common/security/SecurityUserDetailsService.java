@@ -1,5 +1,7 @@
 package com.practice.cursor.common.security;
 
+import com.practice.cursor.common.exception.CustomException;
+import com.practice.cursor.common.exception.ErrorCode;
 import com.practice.cursor.domain.member.entity.Member;
 import com.practice.cursor.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
