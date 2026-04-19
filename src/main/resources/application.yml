@@ -16,3 +16,9 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+# JWT 설정
+jwt:
+  secret: your-secret-key-here-must-be-at-least-256-bits-long-for-HS256-algorithm
+  access-token-expiration: 1800000    # 30분 (ms)
+  refresh-token-expiration: 604800000 # 7일 (ms)
