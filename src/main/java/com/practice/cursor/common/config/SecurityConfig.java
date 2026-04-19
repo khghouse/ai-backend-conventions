@@ -1,9 +1,13 @@
 package com.practice.cursor.common.config;
 
+import com.practice.cursor.common.security.JwtAuthenticationEntryPoint;
 import com.practice.cursor.common.security.JwtAuthenticationFilter;
+import com.practice.cursor.common.security.SecurityAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -23,6 +27,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final SecurityAuthenticationProvider securityAuthenticationProvider;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -38,14 +44,23 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll() // 인증 관련 API는 허용
+                        .requestMatchers("/api/auth/login", "/api/auth/reissue").permitAll() // 로그인, 재발급만 허용
                         .anyRequest().authenticated() // 나머지는 인증 필요
                 )
                 .headers(headers -> headers
                         .frameOptions().disable() // H2 Console 사용을 위해
                 )
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint) // 인증 실패 시 처리
+                )
+                .authenticationProvider(securityAuthenticationProvider) // 커스텀 AuthenticationProvider 등록
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 }
