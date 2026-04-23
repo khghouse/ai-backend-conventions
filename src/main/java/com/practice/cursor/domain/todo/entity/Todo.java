@@ -1,6 +1,8 @@
 package com.practice.cursor.domain.todo.entity;
 
 import com.practice.cursor.global.entity.BaseEntity;
+import com.practice.cursor.global.exception.CustomException;
+import com.practice.cursor.global.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -103,26 +105,25 @@ public class Todo extends BaseEntity {
 
     private void ensureNotDeleted() {
         if (deleted) {
-            throw new IllegalStateException("삭제된 할 일은 변경할 수 없습니다.");
+            throw new CustomException(ErrorCode.TODO_DELETED);
         }
     }
 
     private static void requireNonBlankTitle(String title) {
         if (title == null || title.isBlank()) {
-            throw new IllegalArgumentException("제목은 필수이며 비어 있을 수 없습니다.");
+            throw new CustomException(ErrorCode.TODO_TITLE_REQUIRED);
         }
     }
 
     private static void validateTitleLength(String trimmedTitle) {
         if (trimmedTitle.length() < TITLE_MIN_LENGTH || trimmedTitle.length() > TITLE_MAX_LENGTH) {
-            throw new IllegalArgumentException(
-                    "제목은 " + TITLE_MIN_LENGTH + "자 이상 " + TITLE_MAX_LENGTH + "자 이하여야 합니다.");
+            throw new CustomException(ErrorCode.TODO_TITLE_LENGTH_INVALID, TITLE_MIN_LENGTH, TITLE_MAX_LENGTH);
         }
     }
 
     private static void validateContent(String content) {
         if (content != null && content.length() > CONTENT_MAX_LENGTH) {
-            throw new IllegalArgumentException("내용은 최대 " + CONTENT_MAX_LENGTH + "자까지 입력할 수 있습니다.");
+            throw new CustomException(ErrorCode.TODO_CONTENT_LENGTH_EXCEEDED, CONTENT_MAX_LENGTH);
         }
     }
 }

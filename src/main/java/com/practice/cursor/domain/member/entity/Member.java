@@ -1,6 +1,8 @@
 package com.practice.cursor.domain.member.entity;
 
 import com.practice.cursor.global.entity.BaseEntity;
+import com.practice.cursor.global.exception.CustomException;
+import com.practice.cursor.global.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -99,29 +101,29 @@ public class Member extends BaseEntity {
 
     private static void validateLoginId(String loginId) {
         if (loginId == null || loginId.isBlank()) {
-            throw new IllegalArgumentException("로그인 ID는 필수이며 비어 있을 수 없습니다.");
+            throw new CustomException(ErrorCode.MEMBER_LOGIN_ID_REQUIRED);
         }
         String trimmedLoginId = loginId.trim();
         if (trimmedLoginId.length() < LOGIN_ID_MIN_LENGTH || trimmedLoginId.length() > LOGIN_ID_MAX_LENGTH) {
-            throw new IllegalArgumentException(
-                    "로그인 ID는 " + LOGIN_ID_MIN_LENGTH + "자 이상 " + LOGIN_ID_MAX_LENGTH + "자 이하여야 합니다.");
+            throw new CustomException(
+                    ErrorCode.MEMBER_LOGIN_ID_LENGTH_INVALID, LOGIN_ID_MIN_LENGTH, LOGIN_ID_MAX_LENGTH);
         }
     }
 
     private static void validateNickname(String nickname) {
         if (nickname == null || nickname.isBlank()) {
-            throw new IllegalArgumentException("닉네임은 필수이며 비어 있을 수 없습니다.");
+            throw new CustomException(ErrorCode.MEMBER_NICKNAME_REQUIRED);
         }
         String trimmedNickname = nickname.trim();
         if (trimmedNickname.length() < NICKNAME_MIN_LENGTH || trimmedNickname.length() > NICKNAME_MAX_LENGTH) {
-            throw new IllegalArgumentException(
-                    "닉네임은 " + NICKNAME_MIN_LENGTH + "자 이상 " + NICKNAME_MAX_LENGTH + "자 이하여야 합니다.");
+            throw new CustomException(
+                    ErrorCode.MEMBER_NICKNAME_LENGTH_INVALID, NICKNAME_MIN_LENGTH, NICKNAME_MAX_LENGTH);
         }
     }
 
     private static void requireNonBlankPassword(String password) {
         if (password == null || password.isBlank()) {
-            throw new IllegalArgumentException("비밀번호는 필수이며 비어 있을 수 없습니다.");
+            throw new CustomException(ErrorCode.MEMBER_PASSWORD_REQUIRED);
         }
     }
 }

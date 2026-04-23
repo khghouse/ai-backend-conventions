@@ -3,6 +3,8 @@ package com.practice.cursor.domain.todo.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.practice.cursor.global.exception.CustomException;
+import com.practice.cursor.global.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -70,7 +72,8 @@ class TodoTest {
     @DisplayName("트림 후 제목이 1자이면 생성에 실패한다")
     void create_trimmedTitleTooShort_fails() {
         assertThatThrownBy(() -> Todo.create(" a ", null))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ErrorCode.TODO_TITLE_LENGTH_INVALID.formatMessage(2, 50))
                 .hasMessageContaining("제목")
                 .hasMessageContaining("2");
     }
@@ -79,7 +82,8 @@ class TodoTest {
     @DisplayName("제목이 1자이면 생성에 실패한다")
     void create_titleTooShort_fails() {
         assertThatThrownBy(() -> Todo.create("a", null))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ErrorCode.TODO_TITLE_LENGTH_INVALID.formatMessage(2, 50))
                 .hasMessageContaining("제목")
                 .hasMessageContaining("50");
     }
@@ -90,7 +94,8 @@ class TodoTest {
         String fiftyOne = "b".repeat(51);
 
         assertThatThrownBy(() -> Todo.create(fiftyOne, null))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ErrorCode.TODO_TITLE_LENGTH_INVALID.formatMessage(2, 50))
                 .hasMessageContaining("제목");
     }
 
@@ -100,7 +105,8 @@ class TodoTest {
         String fiveHundredOne = "c".repeat(501);
 
         assertThatThrownBy(() -> Todo.create("유효한제목입니다", fiveHundredOne))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ErrorCode.TODO_CONTENT_LENGTH_EXCEEDED.formatMessage(500))
                 .hasMessageContaining("내용")
                 .hasMessageContaining("500");
     }
@@ -109,7 +115,8 @@ class TodoTest {
     @DisplayName("제목이 null이면 생성에 실패한다")
     void create_nullTitle_fails() {
         assertThatThrownBy(() -> Todo.create(null, "내용"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ErrorCode.TODO_TITLE_REQUIRED.getMessage())
                 .hasMessageContaining("제목");
     }
 
@@ -119,7 +126,8 @@ class TodoTest {
     @DisplayName("제목이 비어 있거나 공백만 있으면 생성에 실패한다")
     void create_blankTitle_fails(String title) {
         assertThatThrownBy(() -> Todo.create(title, "내용"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ErrorCode.TODO_TITLE_REQUIRED.getMessage())
                 .hasMessageContaining("제목");
     }
 
@@ -139,7 +147,9 @@ class TodoTest {
         Todo todo = Todo.create("할일", null);
         todo.delete();
 
-        assertThatThrownBy(todo::complete).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(todo::complete)
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ErrorCode.TODO_DELETED.getMessage());
     }
 
     @Test
@@ -170,6 +180,7 @@ class TodoTest {
         todo.delete();
 
         assertThatThrownBy(() -> todo.updateTitleAndContent("a", "b"))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ErrorCode.TODO_DELETED.getMessage());
     }
 }

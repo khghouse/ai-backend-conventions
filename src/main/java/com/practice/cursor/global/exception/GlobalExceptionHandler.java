@@ -26,20 +26,6 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.fail(e.getErrorCode(), e.getFormattedMessage()));
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiResponse<Void>> handleIllegalArgument(IllegalArgumentException e) {
-        return ResponseEntity
-                .badRequest()
-                .body(ApiResponse.fail(ErrorCode.INVALID_INPUT_VALUE, e.getMessage()));
-    }
-
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<ApiResponse<Void>> handleIllegalState(IllegalStateException e) {
-        return ResponseEntity
-                .badRequest()
-                .body(ApiResponse.fail(ErrorCode.INVALID_INPUT_VALUE, e.getMessage()));
-    }
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleException(Exception e) {
         return ResponseEntity
