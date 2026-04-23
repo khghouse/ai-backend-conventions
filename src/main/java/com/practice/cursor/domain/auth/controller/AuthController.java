@@ -1,6 +1,6 @@
 package com.practice.cursor.domain.auth.controller;
 
-import com.practice.cursor.common.response.ApiResponse;
+import com.practice.cursor.global.response.ApiResponse;
 import com.practice.cursor.domain.auth.dto.request.LoginRequest;
 import com.practice.cursor.domain.auth.dto.request.LoginServiceRequest;
 import com.practice.cursor.domain.auth.dto.request.ReissueRequest;

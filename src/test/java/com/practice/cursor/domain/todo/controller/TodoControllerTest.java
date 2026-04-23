@@ -1,9 +1,9 @@
 package com.practice.cursor.domain.todo.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.practice.cursor.common.exception.CustomException;
-import com.practice.cursor.common.exception.ErrorCode;
-import com.practice.cursor.common.exception.GlobalExceptionHandler;
+import com.practice.cursor.global.exception.CustomException;
+import com.practice.cursor.global.exception.ErrorCode;
+import com.practice.cursor.global.exception.GlobalExceptionHandler;
 import com.practice.cursor.domain.todo.dto.request.TodoCreateRequest;
 import com.practice.cursor.domain.todo.dto.request.TodoCreateServiceRequest;
 import com.practice.cursor.domain.todo.dto.response.TodoResponse;

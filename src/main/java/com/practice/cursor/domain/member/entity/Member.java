@@ -1,6 +1,6 @@
 package com.practice.cursor.domain.member.entity;
 
-import com.practice.cursor.common.entity.BaseEntity;
+import com.practice.cursor.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

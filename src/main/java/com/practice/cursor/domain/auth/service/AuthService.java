@@ -1,11 +1,11 @@
 package com.practice.cursor.domain.auth.service;
 
-import com.practice.cursor.common.exception.CustomException;
-import com.practice.cursor.common.exception.ErrorCode;
-import com.practice.cursor.common.security.SecurityAuthenticationProvider;
-import com.practice.cursor.common.security.SecurityUser;
-import com.practice.cursor.common.service.TokenRedisService;
-import com.practice.cursor.common.util.JwtUtil;
+import com.practice.cursor.global.exception.CustomException;
+import com.practice.cursor.global.exception.ErrorCode;
+import com.practice.cursor.global.security.SecurityAuthenticationProvider;
+import com.practice.cursor.global.security.SecurityUser;
+import com.practice.cursor.global.service.TokenRedisService;
+import com.practice.cursor.global.util.JwtUtil;
 import com.practice.cursor.domain.auth.dto.request.LoginServiceRequest;
 import com.practice.cursor.domain.auth.dto.response.TokenResponse;
 import com.practice.cursor.domain.member.entity.Member;

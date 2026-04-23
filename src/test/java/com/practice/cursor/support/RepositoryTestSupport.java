@@ -1,6 +1,6 @@
 package com.practice.cursor.support;
 
-import com.practice.cursor.common.config.JpaAuditingConfig;
+import com.practice.cursor.global.config.JpaAuditingConfig;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;

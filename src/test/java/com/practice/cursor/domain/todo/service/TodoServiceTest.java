@@ -3,8 +3,8 @@ package com.practice.cursor.domain.todo.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.practice.cursor.common.exception.CustomException;
-import com.practice.cursor.common.exception.ErrorCode;
+import com.practice.cursor.global.exception.CustomException;
+import com.practice.cursor.global.exception.ErrorCode;
 import com.practice.cursor.domain.todo.dto.request.TodoCreateServiceRequest;
 import com.practice.cursor.domain.todo.dto.request.TodoUpdateServiceRequest;
 import com.practice.cursor.domain.todo.dto.response.TodoResponse;

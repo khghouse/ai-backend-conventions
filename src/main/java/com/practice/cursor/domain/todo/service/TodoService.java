@@ -1,7 +1,7 @@
 package com.practice.cursor.domain.todo.service;
 
-import com.practice.cursor.common.exception.CustomException;
-import com.practice.cursor.common.exception.ErrorCode;
+import com.practice.cursor.global.exception.CustomException;
+import com.practice.cursor.global.exception.ErrorCode;
 import com.practice.cursor.domain.todo.dto.request.TodoCreateServiceRequest;
 import com.practice.cursor.domain.todo.dto.response.TodoResponse;
 import com.practice.cursor.domain.todo.dto.request.TodoUpdateServiceRequest;

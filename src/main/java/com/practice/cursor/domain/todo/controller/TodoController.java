@@ -1,6 +1,6 @@
 package com.practice.cursor.domain.todo.controller;
 
-import com.practice.cursor.common.response.ApiResponse;
+import com.practice.cursor.global.response.ApiResponse;
 import com.practice.cursor.domain.todo.dto.request.TodoCreateRequest;
 import com.practice.cursor.domain.todo.dto.request.TodoCreateServiceRequest;
 import com.practice.cursor.domain.todo.dto.response.TodoResponse;
