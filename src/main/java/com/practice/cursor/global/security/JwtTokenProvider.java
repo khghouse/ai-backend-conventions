@@ -1,5 +1,7 @@
 package com.practice.cursor.global.security;
 
+import com.practice.cursor.global.exception.CustomException;
+import com.practice.cursor.global.exception.ErrorCode;
 import com.practice.cursor.domain.member.entity.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -25,6 +27,7 @@ public class JwtTokenProvider {
 
     private static final String MEMBER_ID_CLAIM = "memberId";
     private static final String ROLE_CLAIM = "role";
+    private static final String TOKEN_TYPE_CLAIM = "tokenType";
 
     private final SecretKey secretKey;
     private final long accessTokenExpiration;
@@ -49,6 +52,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .claim(MEMBER_ID_CLAIM, memberId)
                 .claim(ROLE_CLAIM, role.name())
+                .claim(TOKEN_TYPE_CLAIM, TokenType.ACCESS.name())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiration))
                 .signWith(secretKey)
@@ -64,6 +68,7 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .claim(MEMBER_ID_CLAIM, memberId)
+                .claim(TOKEN_TYPE_CLAIM, TokenType.REFRESH.name())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiration))
                 .signWith(secretKey)
@@ -85,6 +90,15 @@ public class JwtTokenProvider {
         Claims claims = extractClaims(token);
         String roleName = claims.get(ROLE_CLAIM, String.class);
         return Role.valueOf(roleName);
+    }
+
+    /**
+     * 토큰 타입을 추출한다.
+     */
+    public TokenType extractTokenType(String token) {
+        Claims claims = extractClaims(token);
+        String tokenType = claims.get(TOKEN_TYPE_CLAIM, String.class);
+        return TokenType.valueOf(tokenType);
     }
 
     /**
@@ -116,6 +130,20 @@ public class JwtTokenProvider {
     }
 
     /**
+     * Access Token 타입인지 검증한다.
+     */
+    public void validateAccessTokenType(String token) {
+        validateTokenType(token, TokenType.ACCESS);
+    }
+
+    /**
+     * Refresh Token 타입인지 검증한다.
+     */
+    public void validateRefreshTokenType(String token) {
+        validateTokenType(token, TokenType.REFRESH);
+    }
+
+    /**
      * 토큰의 남은 만료시간을 밀리초로 계산한다.
      * 로그아웃 시 블랙리스트 TTL 설정에 사용된다.
      */
@@ -134,5 +162,17 @@ public class JwtTokenProvider {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    private void validateTokenType(String token, TokenType expectedType) {
+        TokenType actualType = extractTokenType(token);
+        if (actualType != expectedType) {
+            throw new CustomException(ErrorCode.TOKEN_TYPE_INVALID);
+        }
+    }
+
+    public enum TokenType {
+        ACCESS,
+        REFRESH
     }
 }

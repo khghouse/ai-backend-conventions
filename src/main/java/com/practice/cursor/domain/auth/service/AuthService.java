@@ -64,6 +64,7 @@ public class AuthService {
     public TokenResponse reissue(String refreshToken) {
         // Refresh Token 유효성 검증
         jwtTokenProvider.validateToken(refreshToken);
+        jwtTokenProvider.validateRefreshTokenType(refreshToken);
         
         // memberId 추출
         Long memberId = jwtTokenProvider.extractMemberId(refreshToken);
@@ -92,6 +93,9 @@ public class AuthService {
      */
     @Transactional
     public void logout(String accessToken, Long memberId) {
+        jwtTokenProvider.validateToken(accessToken);
+        jwtTokenProvider.validateAccessTokenType(accessToken);
+
         // Access Token 블랙리스트에 추가
         long remainingTime = jwtTokenProvider.getTokenRemainingTime(accessToken);
         tokenRedisService.addToBlacklist(accessToken, remainingTime);

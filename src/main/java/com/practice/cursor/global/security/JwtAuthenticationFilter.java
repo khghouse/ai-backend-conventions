@@ -1,6 +1,7 @@
 package com.practice.cursor.global.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.practice.cursor.global.exception.CustomException;
 import com.practice.cursor.global.exception.ErrorCode;
 import com.practice.cursor.global.response.ApiResponse;
 import com.practice.cursor.global.service.RedisTokenService;
@@ -59,6 +60,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // 토큰 유효성 검증
             jwtTokenProvider.validateToken(token);
+            jwtTokenProvider.validateAccessTokenType(token);
 
             // 블랙리스트 확인
             if (tokenRedisService.isBlacklisted(token)) {
@@ -73,6 +75,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (ExpiredJwtException e) {
             log.debug("만료된 토큰입니다: {}", e.getMessage());
             sendErrorResponse(response, ErrorCode.TOKEN_EXPIRED);
+        } catch (CustomException e) {
+            log.debug("커스텀 토큰 검증 오류입니다: {}", e.getMessage());
+            sendErrorResponse(response, e.getErrorCode());
         } catch (SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
             log.debug("유효하지 않은 토큰입니다: {}", e.getMessage());
             sendErrorResponse(response, ErrorCode.TOKEN_INVALID);
