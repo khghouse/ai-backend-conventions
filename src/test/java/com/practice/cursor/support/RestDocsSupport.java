@@ -1,16 +1,17 @@
 package com.practice.cursor.support;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.filter.CharacterEncodingFilter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
@@ -40,7 +41,8 @@ public abstract class RestDocsSupport {
     protected MockMvc mockMvc;
     protected RestDocumentationResultHandler document;
     protected ObjectMapper objectMapper = new ObjectMapper()
-            .registerModule(new JavaTimeModule());
+            .registerModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     @BeforeEach
     void setUp(RestDocumentationContextProvider provider) {
@@ -48,12 +50,9 @@ public abstract class RestDocsSupport {
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()));
 
-        // Jackson 설정이 적용된 ObjectMapper 생성
-        ObjectMapper objectMapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule());
-
         this.mockMvc = MockMvcBuilders.standaloneSetup(initController())
                 .addFilters(new CharacterEncodingFilter("UTF-8", true))
+                .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
                 .apply(documentationConfiguration(provider))
                 .alwaysDo(document)
                 .build();
