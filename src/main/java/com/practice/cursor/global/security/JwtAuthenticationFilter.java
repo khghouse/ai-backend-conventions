@@ -3,8 +3,7 @@ package com.practice.cursor.global.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.practice.cursor.global.exception.ErrorCode;
 import com.practice.cursor.global.response.ApiResponse;
-import com.practice.cursor.global.service.TokenRedisService;
-import com.practice.cursor.global.util.JwtUtil;
+import com.practice.cursor.global.service.RedisTokenService;
 import com.practice.cursor.domain.member.entity.Role;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -39,8 +38,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
 
-    private final JwtUtil jwtUtil;
-    private final TokenRedisService tokenRedisService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RedisTokenService tokenRedisService;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -59,7 +58,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             // 토큰 유효성 검증
-            jwtUtil.validateToken(token);
+            jwtTokenProvider.validateToken(token);
 
             // 블랙리스트 확인
             if (tokenRedisService.isBlacklisted(token)) {
@@ -100,8 +99,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * JWT 토큰에서 인증 정보를 추출하여 SecurityContext에 설정한다.
      */
     private void setAuthentication(String token) {
-        Long memberId = jwtUtil.extractMemberId(token);
-        Role role = jwtUtil.extractRole(token);
+        Long memberId = jwtTokenProvider.extractMemberId(token);
+        Role role = jwtTokenProvider.extractRole(token);
         
         String roleName = "ROLE_" + role.name();
         List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(roleName));

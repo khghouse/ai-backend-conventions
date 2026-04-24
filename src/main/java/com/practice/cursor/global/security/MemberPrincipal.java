@@ -14,7 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  * Member 엔티티를 감싸는 래퍼 클래스.
  */
 @RequiredArgsConstructor
-public class SecurityUser implements UserDetails {
+public class MemberPrincipal implements UserDetails {
 
     private final Member member;
 

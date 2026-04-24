@@ -2,7 +2,7 @@ package com.practice.cursor.global.config;
 
 import com.practice.cursor.global.security.JwtAuthenticationEntryPoint;
 import com.practice.cursor.global.security.JwtAuthenticationFilter;
-import com.practice.cursor.global.security.SecurityAuthenticationProvider;
+import com.practice.cursor.global.security.MemberAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +27,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    private final SecurityAuthenticationProvider securityAuthenticationProvider;
+    private final MemberAuthenticationProvider memberAuthenticationProvider;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint) // 인증 실패 시 처리
                 )
-                .authenticationProvider(securityAuthenticationProvider) // 커스텀 AuthenticationProvider 등록
+                .authenticationProvider(memberAuthenticationProvider) // 커스텀 AuthenticationProvider 등록
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

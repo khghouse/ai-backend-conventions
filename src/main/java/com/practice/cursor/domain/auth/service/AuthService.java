@@ -2,10 +2,10 @@ package com.practice.cursor.domain.auth.service;
 
 import com.practice.cursor.global.exception.CustomException;
 import com.practice.cursor.global.exception.ErrorCode;
-import com.practice.cursor.global.security.SecurityAuthenticationProvider;
-import com.practice.cursor.global.security.SecurityUser;
-import com.practice.cursor.global.service.TokenRedisService;
-import com.practice.cursor.global.util.JwtUtil;
+import com.practice.cursor.global.security.JwtTokenProvider;
+import com.practice.cursor.global.security.MemberAuthenticationProvider;
+import com.practice.cursor.global.security.MemberPrincipal;
+import com.practice.cursor.global.service.RedisTokenService;
 import com.practice.cursor.domain.auth.dto.request.LoginServiceRequest;
 import com.practice.cursor.domain.auth.dto.response.TokenResponse;
 import com.practice.cursor.domain.member.entity.Member;
@@ -25,9 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class AuthService {
 
-    private final SecurityAuthenticationProvider authenticationProvider;
-    private final JwtUtil jwtUtil;
-    private final TokenRedisService tokenRedisService;
+    private final MemberAuthenticationProvider authenticationProvider;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RedisTokenService tokenRedisService;
     private final MemberRepository memberRepository;
 
     /**
@@ -43,13 +43,13 @@ public class AuthService {
         Authentication authentication = authenticationProvider.authenticate(authRequest);
         
         // 인증된 사용자 정보 추출
-        SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
-        Long memberId = securityUser.getMemberId();
-        Role role = securityUser.getRole();
+        MemberPrincipal memberPrincipal = (MemberPrincipal) authentication.getPrincipal();
+        Long memberId = memberPrincipal.getMemberId();
+        Role role = memberPrincipal.getRole();
         
         // 토큰 생성
-        String accessToken = jwtUtil.generateAccessToken(memberId, role);
-        String refreshToken = jwtUtil.generateRefreshToken(memberId);
+        String accessToken = jwtTokenProvider.generateAccessToken(memberId, role);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(memberId);
         
         // Refresh Token Redis에 저장
         tokenRedisService.saveRefreshToken(memberId, refreshToken);
@@ -63,10 +63,10 @@ public class AuthService {
     @Transactional
     public TokenResponse reissue(String refreshToken) {
         // Refresh Token 유효성 검증
-        jwtUtil.validateToken(refreshToken);
+        jwtTokenProvider.validateToken(refreshToken);
         
         // memberId 추출
-        Long memberId = jwtUtil.extractMemberId(refreshToken);
+        Long memberId = jwtTokenProvider.extractMemberId(refreshToken);
         
         // Redis에 저장된 Refresh Token과 일치 여부 확인
         tokenRedisService.validateRefreshToken(memberId, refreshToken);
@@ -78,8 +78,8 @@ public class AuthService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         Role role = member.getRole();
-        String newAccessToken = jwtUtil.generateAccessToken(memberId, role);
-        String newRefreshToken = jwtUtil.generateRefreshToken(memberId);
+        String newAccessToken = jwtTokenProvider.generateAccessToken(memberId, role);
+        String newRefreshToken = jwtTokenProvider.generateRefreshToken(memberId);
         
         // 새 Refresh Token Redis에 저장
         tokenRedisService.saveRefreshToken(memberId, newRefreshToken);
@@ -93,7 +93,7 @@ public class AuthService {
     @Transactional
     public void logout(String accessToken, Long memberId) {
         // Access Token 블랙리스트에 추가
-        long remainingTime = jwtUtil.getTokenRemainingTime(accessToken);
+        long remainingTime = jwtTokenProvider.getTokenRemainingTime(accessToken);
         tokenRedisService.addToBlacklist(accessToken, remainingTime);
         
         // Refresh Token 삭제

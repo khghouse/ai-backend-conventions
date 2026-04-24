@@ -1,4 +1,4 @@
-package com.practice.cursor.global.util;
+package com.practice.cursor.global.security;
 
 import com.practice.cursor.domain.member.entity.Role;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * JwtUtil 단위 테스트.
+ * JwtTokenProvider 단위 테스트.
  */
-class JwtUtilTest {
+class JwtTokenProviderTest {
 
-    private JwtUtil jwtUtil;
+    private JwtTokenProvider jwtTokenProvider;
 
     @BeforeEach
     void setUp() {
@@ -20,7 +20,7 @@ class JwtUtilTest {
         long accessTokenExpiration = 1800000L;
         long refreshTokenExpiration = 604800000L;
 
-        jwtUtil = new JwtUtil(secret, accessTokenExpiration, refreshTokenExpiration);
+        jwtTokenProvider = new JwtTokenProvider(secret, accessTokenExpiration, refreshTokenExpiration);
     }
 
     @Test
@@ -31,12 +31,12 @@ class JwtUtilTest {
         Role role = Role.USER;
 
         // when
-        String accessToken = jwtUtil.generateAccessToken(memberId, role);
+        String accessToken = jwtTokenProvider.generateAccessToken(memberId, role);
 
         // then
-        assertThat(jwtUtil.validateToken(accessToken)).isTrue();
-        assertThat(jwtUtil.extractMemberId(accessToken)).isEqualTo(memberId);
-        assertThat(jwtUtil.extractRole(accessToken)).isEqualTo(role);
+        assertThat(jwtTokenProvider.validateToken(accessToken)).isTrue();
+        assertThat(jwtTokenProvider.extractMemberId(accessToken)).isEqualTo(memberId);
+        assertThat(jwtTokenProvider.extractRole(accessToken)).isEqualTo(role);
     }
 
     @Test
@@ -46,11 +46,11 @@ class JwtUtilTest {
         Long memberId = 1L;
 
         // when
-        String refreshToken = jwtUtil.generateRefreshToken(memberId);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(memberId);
 
         // then
-        assertThat(jwtUtil.validateToken(refreshToken)).isTrue();
-        assertThat(jwtUtil.extractMemberId(refreshToken)).isEqualTo(memberId);
+        assertThat(jwtTokenProvider.validateToken(refreshToken)).isTrue();
+        assertThat(jwtTokenProvider.extractMemberId(refreshToken)).isEqualTo(memberId);
     }
 
 }

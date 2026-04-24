@@ -1,4 +1,4 @@
-package com.practice.cursor.global.util;
+package com.practice.cursor.global.security;
 
 import com.practice.cursor.domain.member.entity.Role;
 import io.jsonwebtoken.Claims;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class JwtUtil {
+public class JwtTokenProvider {
 
     private static final String MEMBER_ID_CLAIM = "memberId";
     private static final String ROLE_CLAIM = "role";
@@ -30,7 +30,7 @@ public class JwtUtil {
     private final long accessTokenExpiration;
     private final long refreshTokenExpiration;
 
-    public JwtUtil(
+    public JwtTokenProvider(
             @Value("${jwt.secret}") String secret,
             @Value("${jwt.access-token-expiration}") long accessTokenExpiration,
             @Value("${jwt.refresh-token-expiration}") long refreshTokenExpiration) {

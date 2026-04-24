@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
-public class TokenRedisService {
+public class RedisTokenService {
 
     private static final String REFRESH_TOKEN_PREFIX = "refresh:";
     private static final String BLACKLIST_PREFIX = "blacklist:";
