@@ -1,0 +1,33 @@
+[[common-response]]
+= 공통 응답
+
+[[common-response-success]]
+== 성공 응답 예시
+
+[source,json]
+----
+{
+  "status": 200,
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "홍길동",
+    "email": "hong@example.com"
+  }
+}
+----
+
+[[common-response-fail]]
+== 실패 응답 예시
+
+[source,json]
+----
+{
+  "status": 422,
+  "success": false,
+  "error": {
+    "code": "LENGTH_EXCEEDED",
+    "message": "글자 수 제한을 초과하였습니다. [최대 100자]"
+  }
+}
+----

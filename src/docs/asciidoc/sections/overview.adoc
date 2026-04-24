@@ -1,0 +1,61 @@
+[[overview]]
+= 개요
+
+Todo API 문서입니다.
+
+[[overview-http-verbs]]
+== HTTP 동사
+
+본 REST API에서 사용하는 HTTP 동사(verbs)는 가능한 한 표준 HTTP와 REST 규약을 따릅니다.
+
+|===
+| 동사 | 용례
+
+| `GET`
+| 리소스를 가져올 때 사용
+
+| `POST`
+| 새 리소스를 만들 때 사용
+
+| `PUT`
+| 기존 리소스를 수정할 때 사용
+
+| `PATCH`
+| 기존 리소스의 일부를 수정할 때 사용
+
+| `DELETE`
+| 기존 리소스를 삭제할 때 사용
+|===
+
+[[overview-http-status-codes]]
+== HTTP 상태 코드
+
+본 REST API에서 사용하는 HTTP 상태 코드는 가능한 한 표준 HTTP와 REST 규약을 따릅니다.
+
+|===
+| 상태 코드 | 용례
+
+| `200 OK`
+| 요청을 성공적으로 처리함
+
+| `400 Bad Request`
+| 잘못된 요청 (유효성 검사 실패)
+
+| `401 Unauthorized`
+| 인증 실패
+
+| `403 Forbidden`
+| 권한 없음
+
+| `404 Not Found`
+| 요청한 리소스가 없음
+
+| `409 Conflict`
+| 데이터 중복 및 상태 충돌
+
+| `422 Unprocessable Entity`
+| 비즈니스 로직 / 정책 위반
+
+| `500 Internal Server Error`
+| 서버 내부 오류
+|===
