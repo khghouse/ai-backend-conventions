@@ -44,7 +44,6 @@ class TodoIntegrationTest extends IntegrationTestSupport {
         assertThat(createdTodo.title()).isEqualTo("통합 테스트");
         assertThat(createdTodo.content()).isEqualTo("E2E 플로우 검증");
         assertThat(createdTodo.completed()).isFalse();
-        assertThat(createdTodo.deleted()).isFalse();
 
         // when - 할 일 완료 처리
         TodoResponse completedTodo = todoService.complete(createdTodo.id());
@@ -52,7 +51,6 @@ class TodoIntegrationTest extends IntegrationTestSupport {
         // then - 완료 처리 검증
         assertThat(completedTodo.id()).isEqualTo(createdTodo.id());
         assertThat(completedTodo.completed()).isTrue();
-        assertThat(completedTodo.deleted()).isFalse();
 
         // when - DB에서 직접 조회
         Todo todoFromDb = todoRepository.findById(createdTodo.id()).orElseThrow();
@@ -114,7 +112,6 @@ class TodoIntegrationTest extends IntegrationTestSupport {
         assertThat(updatedTodo.title()).isEqualTo("수정된 제목");
         assertThat(updatedTodo.content()).isEqualTo("수정된 내용");
         assertThat(updatedTodo.completed()).isFalse();
-        assertThat(updatedTodo.deleted()).isFalse();
         
         // when - 단건 조회로 재검증
         TodoResponse retrievedTodo = todoService.getById(createdTodo.id());

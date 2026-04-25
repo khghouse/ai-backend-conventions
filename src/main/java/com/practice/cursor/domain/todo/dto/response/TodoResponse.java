@@ -7,7 +7,6 @@ public record TodoResponse(
         Long id,
         String title,
         String content,
-        boolean deleted,
         boolean completed,
         LocalDateTime createDateTime,
         LocalDateTime modifiedDateTime) {
@@ -20,7 +19,6 @@ public record TodoResponse(
                 todo.getId(),
                 todo.getTitle(),
                 todo.getContent(),
-                todo.isDeleted(),
                 todo.isCompleted(),
                 todo.getCreateDateTime(),
                 todo.getModifiedDateTime());

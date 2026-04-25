@@ -51,7 +51,7 @@ class TodoControllerTest extends ControllerTestSupport {
 
     private static TodoResponse sample(Long id) {
         LocalDateTime now = LocalDateTime.of(2026, 4, 2, 12, 0, 0);
-        return new TodoResponse(id, "할 일", "상세", false, false, now, now);
+        return new TodoResponse(id, "할 일", "상세", false, now, now);
     }
 
     private Authentication authenticatedUser() {
@@ -143,8 +143,8 @@ class TodoControllerTest extends ControllerTestSupport {
         when(todoService.findAll())
                 .thenReturn(
                         List.of(
-                                new TodoResponse(1L, "a", null, false, false, now, now),
-                                new TodoResponse(2L, "b", "x", false, true, now, now)));
+                                new TodoResponse(1L, "a", null, false, now, now),
+                                new TodoResponse(2L, "b", "x", true, now, now)));
 
         mockMvc.perform(get("/api/todos")
                         .with(authentication(authenticatedUser())))
@@ -158,7 +158,7 @@ class TodoControllerTest extends ControllerTestSupport {
     @DisplayName("PATCH 완료 처리")
     void complete_existingTodo_returnsOkWithCompletedTodo() throws Exception {
         LocalDateTime now = LocalDateTime.of(2026, 4, 2, 12, 0, 0);
-        when(todoService.complete(1L)).thenReturn(new TodoResponse(1L, "할 일", null, false, true, now, now));
+        when(todoService.complete(1L)).thenReturn(new TodoResponse(1L, "할 일", null, true, now, now));
 
         mockMvc.perform(patch("/api/todos/1/complete")
                         .with(csrf())
@@ -171,12 +171,13 @@ class TodoControllerTest extends ControllerTestSupport {
     @DisplayName("DELETE 소프트 삭제")
     void delete_existingTodo_returnsOkWithDeletedTodo() throws Exception {
         LocalDateTime now = LocalDateTime.of(2026, 4, 2, 12, 0, 0);
-        when(todoService.delete(1L)).thenReturn(new TodoResponse(1L, "할 일", null, true, false, now, now));
+        when(todoService.delete(1L)).thenReturn(new TodoResponse(1L, "할 일", null, false, now, now));
 
         mockMvc.perform(delete("/api/todos/1")
                         .with(csrf())
                         .with(authentication(authenticatedUser())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.deleted").value(true));
+                .andExpect(jsonPath("$.data.id").value(1))
+                .andExpect(jsonPath("$.data.completed").value(false));
     }
 }

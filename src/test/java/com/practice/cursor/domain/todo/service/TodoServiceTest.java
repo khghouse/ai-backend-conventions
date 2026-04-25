@@ -47,7 +47,6 @@ class TodoServiceTest extends IntegrationTestSupport {
         assertThat(response.title()).isEqualTo("할 일 제목");
         assertThat(response.content()).isEqualTo("할 일 내용");
         assertThat(response.completed()).isFalse();
-        assertThat(response.deleted()).isFalse();
         assertThat(response.createDateTime()).isNotNull();
         assertThat(response.modifiedDateTime()).isNotNull();
 
@@ -72,7 +71,6 @@ class TodoServiceTest extends IntegrationTestSupport {
         assertThat(response.title()).isEqualTo("수정된 제목");
         assertThat(response.content()).isEqualTo("수정된 내용");
         assertThat(response.completed()).isFalse();
-        assertThat(response.deleted()).isFalse();
     }
 
     @Test
@@ -101,7 +99,6 @@ class TodoServiceTest extends IntegrationTestSupport {
         assertThat(response.title()).isEqualTo("할 일 제목");
         assertThat(response.content()).isEqualTo("할 일 내용");
         assertThat(response.completed()).isFalse();
-        assertThat(response.deleted()).isFalse();
     }
 
     @Test
@@ -143,7 +140,6 @@ class TodoServiceTest extends IntegrationTestSupport {
         // then
         assertThat(response.id()).isEqualTo(savedTodo.getId());
         assertThat(response.completed()).isTrue();
-        assertThat(response.deleted()).isFalse();
 
         // DB 검증
         Todo updatedTodo = todoRepository.findById(savedTodo.getId()).orElseThrow();
@@ -171,7 +167,6 @@ class TodoServiceTest extends IntegrationTestSupport {
         // then
         assertThat(response.id()).isEqualTo(savedTodo.getId());
         assertThat(response.completed()).isFalse();
-        assertThat(response.deleted()).isTrue();
 
         // DB 검증
         Todo deletedTodo = todoRepository.findById(savedTodo.getId()).orElseThrow();

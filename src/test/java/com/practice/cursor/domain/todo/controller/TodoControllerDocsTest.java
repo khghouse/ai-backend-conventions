@@ -49,7 +49,6 @@ class TodoControllerDocsTest extends RestDocsSupport {
                 "할 일 제목",
                 "할 일 내용",
                 false,
-                false,
                 LocalDateTime.of(2026, 4, 17, 12, 0, 0),
                 LocalDateTime.of(2026, 4, 17, 12, 0, 0)
         );
@@ -88,9 +87,6 @@ class TodoControllerDocsTest extends RestDocsSupport {
                                         .optional()
                                         .attributes(key("required").value("false"))
                                         .description("할 일 내용"),
-                                fieldWithPath("data.deleted").type(JsonFieldType.BOOLEAN)
-                                        .attributes(key("required").value("true"))
-                                        .description("삭제 여부"),
                                 fieldWithPath("data.completed").type(JsonFieldType.BOOLEAN)
                                         .attributes(key("required").value("true"))
                                         .description("완료 여부"),
@@ -112,7 +108,6 @@ class TodoControllerDocsTest extends RestDocsSupport {
                 1L,
                 "할 일 제목",
                 "할 일 내용",
-                false,
                 false,
                 LocalDateTime.of(2026, 4, 17, 12, 0, 0),
                 LocalDateTime.of(2026, 4, 17, 12, 0, 0)
@@ -147,9 +142,6 @@ class TodoControllerDocsTest extends RestDocsSupport {
                                         .optional()
                                         .attributes(key("required").value("false"))
                                         .description("할 일 내용"),
-                                fieldWithPath("data.deleted").type(JsonFieldType.BOOLEAN)
-                                        .attributes(key("required").value("true"))
-                                        .description("삭제 여부"),
                                 fieldWithPath("data.completed").type(JsonFieldType.BOOLEAN)
                                         .attributes(key("required").value("true"))
                                         .description("완료 여부"),
@@ -173,7 +165,6 @@ class TodoControllerDocsTest extends RestDocsSupport {
                         "할 일 1",
                         "첫 번째 할 일",
                         false,
-                        false,
                         LocalDateTime.of(2026, 4, 17, 12, 0, 0),
                         LocalDateTime.of(2026, 4, 17, 12, 0, 0)
                 ),
@@ -181,7 +172,6 @@ class TodoControllerDocsTest extends RestDocsSupport {
                         2L,
                         "할 일 2",
                         "두 번째 할 일",
-                        false,
                         true,
                         LocalDateTime.of(2026, 4, 17, 13, 0, 0),
                         LocalDateTime.of(2026, 4, 17, 14, 0, 0)
@@ -214,9 +204,6 @@ class TodoControllerDocsTest extends RestDocsSupport {
                                         .optional()
                                         .attributes(key("required").value("false"))
                                         .description("할 일 내용"),
-                                fieldWithPath("data[].deleted").type(JsonFieldType.BOOLEAN)
-                                        .attributes(key("required").value("true"))
-                                        .description("삭제 여부"),
                                 fieldWithPath("data[].completed").type(JsonFieldType.BOOLEAN)
                                         .attributes(key("required").value("true"))
                                         .description("완료 여부"),
@@ -239,7 +226,6 @@ class TodoControllerDocsTest extends RestDocsSupport {
                 1L,
                 "수정된 제목",
                 "수정된 내용",
-                false,
                 false,
                 LocalDateTime.of(2026, 4, 17, 12, 0, 0),
                 LocalDateTime.of(2026, 4, 17, 15, 0, 0)
@@ -285,9 +271,6 @@ class TodoControllerDocsTest extends RestDocsSupport {
                                         .optional()
                                         .attributes(key("required").value("false"))
                                         .description("할 일 내용"),
-                                fieldWithPath("data.deleted").type(JsonFieldType.BOOLEAN)
-                                        .attributes(key("required").value("true"))
-                                        .description("삭제 여부"),
                                 fieldWithPath("data.completed").type(JsonFieldType.BOOLEAN)
                                         .attributes(key("required").value("true"))
                                         .description("완료 여부"),
@@ -309,7 +292,6 @@ class TodoControllerDocsTest extends RestDocsSupport {
                 1L,
                 "할 일 제목",
                 "할 일 내용",
-                false,
                 true,
                 LocalDateTime.of(2026, 4, 17, 12, 0, 0),
                 LocalDateTime.of(2026, 4, 17, 15, 0, 0)
@@ -344,9 +326,6 @@ class TodoControllerDocsTest extends RestDocsSupport {
                                         .optional()
                                         .attributes(key("required").value("false"))
                                         .description("할 일 내용"),
-                                fieldWithPath("data.deleted").type(JsonFieldType.BOOLEAN)
-                                        .attributes(key("required").value("true"))
-                                        .description("삭제 여부"),
                                 fieldWithPath("data.completed").type(JsonFieldType.BOOLEAN)
                                         .attributes(key("required").value("true"))
                                         .description("완료 여부"),
@@ -368,7 +347,6 @@ class TodoControllerDocsTest extends RestDocsSupport {
                 1L,
                 "할 일 제목",
                 "할 일 내용",
-                true,
                 false,
                 LocalDateTime.of(2026, 4, 17, 12, 0, 0),
                 LocalDateTime.of(2026, 4, 17, 15, 0, 0)
@@ -403,9 +381,6 @@ class TodoControllerDocsTest extends RestDocsSupport {
                                         .optional()
                                         .attributes(key("required").value("false"))
                                         .description("할 일 내용"),
-                                fieldWithPath("data.deleted").type(JsonFieldType.BOOLEAN)
-                                        .attributes(key("required").value("true"))
-                                        .description("삭제 여부"),
                                 fieldWithPath("data.completed").type(JsonFieldType.BOOLEAN)
                                         .attributes(key("required").value("true"))
                                         .description("완료 여부"),
