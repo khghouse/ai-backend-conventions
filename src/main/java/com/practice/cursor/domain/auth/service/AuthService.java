@@ -1,7 +1,5 @@
 package com.practice.cursor.domain.auth.service;
 
-import com.practice.cursor.global.exception.CustomException;
-import com.practice.cursor.global.exception.ErrorCode;
 import com.practice.cursor.domain.auth.dto.request.RegisterServiceRequest;
 import com.practice.cursor.domain.auth.dto.response.RegisterResponse;
 import com.practice.cursor.global.security.JwtTokenProvider;
@@ -10,13 +8,13 @@ import com.practice.cursor.global.security.MemberPrincipal;
 import com.practice.cursor.global.service.RedisTokenService;
 import com.practice.cursor.domain.auth.dto.request.LoginServiceRequest;
 import com.practice.cursor.domain.auth.dto.response.TokenResponse;
+import com.practice.cursor.domain.member.dto.request.MemberCreateServiceRequest;
 import com.practice.cursor.domain.member.entity.Member;
 import com.practice.cursor.domain.member.entity.Role;
-import com.practice.cursor.domain.member.repository.MemberRepository;
+import com.practice.cursor.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,20 +29,15 @@ public class AuthService {
     private final MemberAuthenticationProvider authenticationProvider;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTokenService tokenRedisService;
-    private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final MemberService memberService;
 
     /**
      * 회원을 등록한다.
      */
     @Transactional
     public RegisterResponse register(RegisterServiceRequest request) {
-        validateDuplicateMember(request);
-
-        String encodedPassword = passwordEncoder.encode(request.password());
-        Member member = Member.create(request.loginId(), encodedPassword, request.nickname());
-        Member savedMember = memberRepository.save(member);
-
+        Member savedMember = memberService.register(
+                MemberCreateServiceRequest.of(request.loginId(), request.password(), request.nickname()));
         return RegisterResponse.from(savedMember);
     }
 
@@ -94,8 +87,7 @@ public class AuthService {
         tokenRedisService.deleteRefreshToken(memberId);
         
         // Member 조회하여 실제 Role 가져오기
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+        Member member = memberService.getById(memberId);
         Role role = member.getRole();
         String newAccessToken = jwtTokenProvider.generateAccessToken(memberId, role);
         String newRefreshToken = jwtTokenProvider.generateRefreshToken(memberId);
@@ -122,13 +114,4 @@ public class AuthService {
         tokenRedisService.deleteRefreshToken(memberId);
     }
 
-    private void validateDuplicateMember(RegisterServiceRequest request) {
-        if (memberRepository.existsByLoginId(request.loginId().trim())) {
-            throw new CustomException(ErrorCode.DUPLICATE_LOGIN_ID);
-        }
-
-        if (memberRepository.existsByNickname(request.nickname().trim())) {
-            throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
-        }
-    }
 }
