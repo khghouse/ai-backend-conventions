@@ -44,4 +44,3 @@ src/main/resources/static/docs/
 
 ### Env ###
 .env
-application-local.yml
