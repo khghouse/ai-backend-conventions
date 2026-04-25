@@ -4,6 +4,9 @@ import com.practice.cursor.global.response.ApiResponse;
 import com.practice.cursor.domain.auth.dto.request.LoginRequest;
 import com.practice.cursor.domain.auth.dto.request.LoginServiceRequest;
 import com.practice.cursor.domain.auth.dto.request.ReissueRequest;
+import com.practice.cursor.domain.auth.dto.request.RegisterRequest;
+import com.practice.cursor.domain.auth.dto.request.RegisterServiceRequest;
+import com.practice.cursor.domain.auth.dto.response.RegisterResponse;
 import com.practice.cursor.domain.auth.dto.response.TokenResponse;
 import com.practice.cursor.domain.auth.service.AuthService;
 import com.practice.cursor.global.security.MemberPrincipal;
@@ -29,6 +32,15 @@ public class AuthController {
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final AuthService authService;
+
+    /**
+     * 회원가입을 처리한다.
+     */
+    @PostMapping("/register")
+    public ApiResponse<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
+        RegisterResponse response = authService.register(RegisterServiceRequest.from(request));
+        return ApiResponse.ok(response);
+    }
 
     /**
      * 로그인을 처리한다.

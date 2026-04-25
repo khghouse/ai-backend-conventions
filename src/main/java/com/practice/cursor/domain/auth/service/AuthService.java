@@ -2,6 +2,8 @@ package com.practice.cursor.domain.auth.service;
 
 import com.practice.cursor.global.exception.CustomException;
 import com.practice.cursor.global.exception.ErrorCode;
+import com.practice.cursor.domain.auth.dto.request.RegisterServiceRequest;
+import com.practice.cursor.domain.auth.dto.response.RegisterResponse;
 import com.practice.cursor.global.security.JwtTokenProvider;
 import com.practice.cursor.global.security.MemberAuthenticationProvider;
 import com.practice.cursor.global.security.MemberPrincipal;
@@ -14,6 +16,7 @@ import com.practice.cursor.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +32,21 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTokenService tokenRedisService;
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    /**
+     * 회원을 등록한다.
+     */
+    @Transactional
+    public RegisterResponse register(RegisterServiceRequest request) {
+        validateDuplicateMember(request);
+
+        String encodedPassword = passwordEncoder.encode(request.password());
+        Member member = Member.create(request.loginId(), encodedPassword, request.nickname());
+        Member savedMember = memberRepository.save(member);
+
+        return RegisterResponse.from(savedMember);
+    }
 
     /**
      * 로그인을 처리한다.
@@ -102,5 +120,15 @@ public class AuthService {
         
         // Refresh Token 삭제
         tokenRedisService.deleteRefreshToken(memberId);
+    }
+
+    private void validateDuplicateMember(RegisterServiceRequest request) {
+        if (memberRepository.existsByLoginId(request.loginId().trim())) {
+            throw new CustomException(ErrorCode.DUPLICATE_LOGIN_ID);
+        }
+
+        if (memberRepository.existsByNickname(request.nickname().trim())) {
+            throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
+        }
     }
 }

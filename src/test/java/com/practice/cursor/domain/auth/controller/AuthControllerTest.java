@@ -15,6 +15,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.practice.cursor.domain.auth.dto.request.LoginRequest;
 import com.practice.cursor.domain.auth.dto.request.LoginServiceRequest;
 import com.practice.cursor.domain.auth.dto.request.ReissueRequest;
+import com.practice.cursor.domain.auth.dto.request.RegisterRequest;
+import com.practice.cursor.domain.auth.dto.request.RegisterServiceRequest;
+import com.practice.cursor.domain.auth.dto.response.RegisterResponse;
 import com.practice.cursor.domain.auth.dto.response.TokenResponse;
 import com.practice.cursor.global.exception.GlobalExceptionHandler;
 import com.practice.cursor.global.security.MemberPrincipal;
@@ -37,6 +40,28 @@ class AuthControllerTest extends ControllerTestSupport {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Test
+    @DisplayName("회원가입 요청이 유효하면 회원 응답을 반환한다")
+    void register_validRequest_returnsRegisterResponse() throws Exception {
+        // given
+        RegisterResponse response = new RegisterResponse(1L, "tester", "테스터", Role.USER);
+        when(authService.register(any(RegisterServiceRequest.class))).thenReturn(response);
+
+        // when & then
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(new RegisterRequest("tester", "password", "테스터"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1))
+                .andExpect(jsonPath("$.data.loginId").value("tester"))
+                .andExpect(jsonPath("$.data.nickname").value("테스터"))
+                .andExpect(jsonPath("$.data.role").value("USER"));
+
+        verify(authService).register(any(RegisterServiceRequest.class));
+    }
 
     @Test
     @DisplayName("로그인 요청이 유효하면 토큰 응답을 반환한다")
@@ -71,6 +96,21 @@ class AuthControllerTest extends ControllerTestSupport {
                 .andExpect(jsonPath("$.error.message").isString());
 
         verify(authService, never()).login(any());
+    }
+
+    @Test
+    @DisplayName("회원가입 요청이 유효하지 않으면 400을 반환한다")
+    void register_invalidRequest_returnsBadRequest() throws Exception {
+        // when & then
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(new RegisterRequest("", "", ""))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error.message").isString());
+
+        verify(authService, never()).register(any());
     }
 
     @Test
